@@ -22,6 +22,7 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios'
 import { Component, Vue } from 'nuxt-property-decorator'
 
 export interface TodoLists {
@@ -35,40 +36,27 @@ export interface TodoLists {
 @Component
 export default class IndexPage extends Vue {
   // data
-  private todoDatas: TodoLists[] = [
-    {
-      id: 1,
-      checked: false,
-      title: '바퀴벌레약 설치해놓기',
-      content: '여름이 다가왔으니 필수!',
-      createAt: '1560577682'
-    },
-    {
-      id: 2,
-      checked: true,
-      title: '닭가슴살 사기',
-      content: '이번 일주일 동안 먹을 고기를 사자!',
-      createAt: '1560577728'
-    },
-    {
-      id: 3,
-      checked: false,
-      title: '수박 사자',
-      content: '여름이 다가왔으니 필수!',
-      createAt: '1560577682'
-    },
-    {
-      id: 4,
-      checked: false,
-      title: '선물 사기',
-      content: '선물 사자',
-      createAt: '1560577682'
-    }
-  ]
+  private todoDatas: TodoLists[] = []
+  // created
+  created() {
+    this.initLoadDatas()
+  }
+  // methods
+  initLoadDatas(): void {
+    axios
+      .get('http://127.0.0.1:8080/api/todos')
+      .then(({ data: todos }) => {
+        this.todoDatas = todos as TodoLists[]
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }
 }
 </script>
 <style lang="scss">
 .container {
+  padding-bottom: 100px;
   position: relative;
   width: 100%;
 }
@@ -135,7 +123,7 @@ export default class IndexPage extends Vue {
   width: 40px;
   height: 40px;
   position: absolute;
-  bottom: -50px;
+  bottom: 50px;
   right: 0;
   button {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
