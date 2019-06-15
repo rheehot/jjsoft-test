@@ -6,6 +6,8 @@ const expressSession = require('express-session');
 const dotenv = require('dotenv');
 const passport = require('passport');
 
+const todosAPIRouter = require('./routes/todos');
+
 dotenv.config();
 const app = express();
 
@@ -25,6 +27,8 @@ app.use(expressSession({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use('/api/todos', todosAPIRouter);
 
 app.listen(8080, () => {
     console.log('server is running on http://localhost:8080');
