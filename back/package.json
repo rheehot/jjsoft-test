@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "jinseongjoo",
   "license": "MIT",
+  "scripts": {
+    "dev": "nodemon"
+  },
   "dependencies": {
     "bcrypt": "^3.0.6",
     "connect-flash": "^0.1.1",
