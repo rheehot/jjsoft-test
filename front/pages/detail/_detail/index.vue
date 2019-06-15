@@ -14,13 +14,25 @@
         Todo Content 1
       </div>
     </el-card>
+    <nuxt-link :to="`/detail/${todoId}/edit`" class="edit-link-button">
+      <el-button type="primary" plain>Edit</el-button>
+    </nuxt-link>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
+import { Route } from 'vue-router'
+
 @Component
-export default class DetailPage extends Vue {}
+export default class DetailPage extends Vue {
+  // data
+  private todoId: number = 0
+  // created
+  created() {
+    this.todoId = Number(this.$route.params.detail)
+  }
+}
 </script>
 
 <style lang="scss">
@@ -47,5 +59,9 @@ export default class DetailPage extends Vue {}
 }
 .back-button {
   float: left;
+}
+.edit-link-button {
+  margin-top: 16px;
+  float: right;
 }
 </style>
