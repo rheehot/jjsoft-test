@@ -43,4 +43,4 @@ const config: NuxtConfiguration = {
   }
 }
 
-export default config;
+export default config
