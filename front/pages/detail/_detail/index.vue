@@ -7,14 +7,18 @@
       Todo Detail
     </h1>
     <el-card :body-style="{ padding: '0px' }" class="detail-content-box">
-      <div class="text item">
-        Todo Title 1
+      <div class="text item title-item">
+        {{ todoTitle }}
       </div>
-      <div class="text item">
-        Todo Content 1
+      <div class="text item content-item">
+        {{ todoContent }}
       </div>
     </el-card>
-    <nuxt-link :to="`/detail/${todoId}/edit`" class="edit-link-button">
+    <nuxt-link
+      v-if="!todoChecked"
+      :to="`/detail/${todoId}/edit`"
+      class="edit-link-button"
+    >
       <el-button type="primary" plain>Edit</el-button>
     </nuxt-link>
   </div>
@@ -24,13 +28,41 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 import { Route } from 'vue-router'
 
+export interface TodoLists {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
+export interface TodoItem {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
 @Component
 export default class DetailPage extends Vue {
   // data
   private todoId: number = 0
-  // created
-  created() {
+  private todoTitle: string = ''
+  private todoContent: string = ''
+  private todoChecked: boolean = false
+  // beforeMount
+  beforeMount() {
     this.todoId = Number(this.$route.params.detail)
+    const todoItems: TodoLists[] = JSON.parse(localStorage.getItem('todos')!)
+    const todoItem: TodoItem | undefined = todoItems.find(item => {
+      return item.id === this.todoId
+    })
+    if (todoItem) {
+      this.todoTitle = todoItem.title
+      this.todoContent = todoItem.content
+      this.todoChecked = todoItem.checked
+    }
   }
 }
 </script>
@@ -63,5 +95,12 @@ export default class DetailPage extends Vue {
 .edit-link-button {
   margin-top: 16px;
   float: right;
+}
+.title-item {
+  font-weight: bold;
+  font-size: 18px;
+}
+.content-item {
+  font-size: 14px;
 }
 </style>

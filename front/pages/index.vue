@@ -3,16 +3,22 @@
     <h1 class="main-title">My TodoList</h1>
     <el-card class="todo-list-box">
       <div
-        v-for="todoData in todoDatas"
-        :key="todoData.id"
+        v-for="todoItem in todoItems"
+        :key="todoItem.id"
         class="text item"
-        :class="{ checked: todoData.checked }"
+        :class="{ checked: todoItem.checked }"
       >
-        <el-checkbox v-model="todoData.checked" />
-        <nuxt-link class="todo-title" :to="`detail/${todoData.id}`">
-          {{ todoData.title }}
+        <el-checkbox
+          v-model="todoItem.checked"
+          @change="changeCheck(todoItem.id)"
+        />
+        <nuxt-link class="todo-title" :to="`detail/${todoItem.id}`">
+          {{ todoItem.title }}
         </nuxt-link>
-        <i class="el-icon-delete todo-delete-button"></i>
+        <i
+          class="el-icon-delete todo-delete-button"
+          @click="deleteCheck(todoItem.id)"
+        />
       </div>
     </el-card>
     <nuxt-link to="add" class="add-todo-button">
@@ -22,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios'
+import axios from '@/plugins/axios'
 import { Component, Vue } from 'nuxt-property-decorator'
 
 export interface TodoLists {
@@ -36,21 +42,32 @@ export interface TodoLists {
 @Component
 export default class IndexPage extends Vue {
   // data
-  private todoDatas: TodoLists[] = []
-  // created
-  created() {
-    this.initLoadDatas()
+  private todoItems: TodoLists[] = []
+  // beforeMount
+  beforeMount() {
+    !localStorage.getItem('todos')
+      ? this.initLoadDatas()
+      : (this.todoItems = JSON.parse(localStorage.getItem('todos')!))
   }
   // methods
-  initLoadDatas(): void {
-    axios
-      .get('http://127.0.0.1:8080/api/todos')
-      .then(({ data: todos }) => {
-        this.todoDatas = todos as TodoLists[]
-      })
-      .catch(err => {
-        console.error(err)
-      })
+  async initLoadDatas() {
+    try {
+      const { data: todos } = await axios.get('todos/')
+      this.todoItems = (await todos) as TodoLists[]
+      await localStorage.setItem('todos', JSON.stringify(todos))
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  private changeCheck(id): void {
+    const findItem = this.todoItems[id]
+    this.todoItems[id] = findItem
+    localStorage.setItem('todos', JSON.stringify(this.todoItems))
+  }
+  private deleteCheck(id): void {
+    const filterItems = this.todoItems.filter(item => item.id !== id)
+    this.todoItems = filterItems
+    localStorage.setItem('todos', JSON.stringify(this.todoItems))
   }
 }
 </script>
