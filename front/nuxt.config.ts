@@ -1,7 +1,11 @@
 import NuxtConfiguration from '@nuxt/config'
 
+const environment = process.env.NODE_ENV
+const envSet = require(`./env/env.${environment}.js`)
+
 const config: NuxtConfiguration = {
   mode: 'universal',
+  env: envSet,
   head: {
     title: process.env.npm_package_name || '',
     meta: [
@@ -14,6 +18,20 @@ const config: NuxtConfiguration = {
       }
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+  },
+  babel: {
+    presets({ isServer }) {
+      return [
+        [
+          '@nuxt/babel-preset-app',
+          {
+            targets: isServer
+              ? { node: 'current' }
+              : { browsers: ['> 1% in KR'] }
+          }
+        ]
+      ]
+    }
   },
   /*
    ** Customize the progress-bar color

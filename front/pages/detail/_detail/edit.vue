@@ -16,17 +16,62 @@
         <el-input v-model="inputContent" type="textarea" />
       </div>
     </el-card>
+    <el-button type="primary" plain class="save-button" @click="saveItem">
+      Save
+    </el-button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
+export interface TodoLists {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
+export interface TodoItem {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
 @Component
 export default class AddPage extends Vue {
   // data
   private inputTitle: string = ''
   private inputContent: string = ''
+  private todoId: number = 0
+  private todoItems: TodoLists[] = []
+
+  // beforeMount
+  beforeMount() {
+    this.todoId = Number(this.$route.params.detail)
+    this.todoItems = JSON.parse(localStorage.getItem('todos')!)
+    const todoItem: TodoItem | undefined = this.todoItems.find(item => {
+      return item.id === this.todoId
+    })
+    if (todoItem) {
+      this.inputTitle = todoItem.title
+      this.inputContent = todoItem.content
+    }
+  }
+
+  // methods
+  private saveItem(): void {
+    this.todoItems[this.todoId].title = this.inputTitle
+    this.todoItems[this.todoId].content = this.inputContent
+    localStorage.setItem('todos', JSON.stringify(this.todoItems))
+    this.$message({
+      message: '수정되었습니다.',
+      type: 'success'
+    })
+  }
 }
 </script>
 
@@ -35,5 +80,9 @@ export default class AddPage extends Vue {
   p {
     text-align: left;
   }
+}
+.save-button {
+  margin-top: 16px;
+  float: right;
 }
 </style>

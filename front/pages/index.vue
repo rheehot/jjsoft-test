@@ -3,16 +3,22 @@
     <h1 class="main-title">My TodoList</h1>
     <el-card class="todo-list-box">
       <div
-        v-for="todoData in todoDatas"
-        :key="todoData.id"
+        v-for="todoItem in todoItems"
+        :key="todoItem.id"
         class="text item"
-        :class="{ checked: todoData.checked }"
+        :class="{ checked: todoItem.checked }"
       >
-        <el-checkbox v-model="todoData.checked" />
-        <nuxt-link class="todo-title" :to="`detail/${todoData.id}`">
-          {{ todoData.title }}
+        <el-checkbox
+          v-model="todoItem.checked"
+          @change="changeCheck(todoItem.id)"
+        />
+        <nuxt-link class="todo-title" :to="`detail/${todoItem.id}`">
+          {{ todoItem.title }}
         </nuxt-link>
-        <i class="el-icon-delete todo-delete-button"></i>
+        <i
+          class="el-icon-delete todo-delete-button"
+          @click="deleteCheck(todoItem.id)"
+        />
       </div>
     </el-card>
     <nuxt-link to="add" class="add-todo-button">
@@ -22,6 +28,7 @@
 </template>
 
 <script lang="ts">
+import axios from '@/plugins/axios'
 import { Component, Vue } from 'nuxt-property-decorator'
 
 export interface TodoLists {
@@ -35,40 +42,38 @@ export interface TodoLists {
 @Component
 export default class IndexPage extends Vue {
   // data
-  private todoDatas: TodoLists[] = [
-    {
-      id: 1,
-      checked: false,
-      title: '바퀴벌레약 설치해놓기',
-      content: '여름이 다가왔으니 필수!',
-      createAt: '1560577682'
-    },
-    {
-      id: 2,
-      checked: true,
-      title: '닭가슴살 사기',
-      content: '이번 일주일 동안 먹을 고기를 사자!',
-      createAt: '1560577728'
-    },
-    {
-      id: 3,
-      checked: false,
-      title: '수박 사자',
-      content: '여름이 다가왔으니 필수!',
-      createAt: '1560577682'
-    },
-    {
-      id: 4,
-      checked: false,
-      title: '선물 사기',
-      content: '선물 사자',
-      createAt: '1560577682'
+  private todoItems: TodoLists[] = []
+  // beforeMount
+  beforeMount() {
+    !localStorage.getItem('todos')
+      ? this.initLoadDatas()
+      : (this.todoItems = JSON.parse(localStorage.getItem('todos')!))
+  }
+  // methods
+  async initLoadDatas() {
+    try {
+      const { data: todos } = await axios.get('todos/')
+      this.todoItems = (await todos) as TodoLists[]
+      await localStorage.setItem('todos', JSON.stringify(todos))
+    } catch (err) {
+      console.error(err)
     }
-  ]
+  }
+  private changeCheck(id): void {
+    const findItem = this.todoItems[id]
+    this.todoItems[id] = findItem
+    localStorage.setItem('todos', JSON.stringify(this.todoItems))
+  }
+  private deleteCheck(id): void {
+    const filterItems = this.todoItems.filter(item => item.id !== id)
+    this.todoItems = filterItems
+    localStorage.setItem('todos', JSON.stringify(this.todoItems))
+  }
 }
 </script>
 <style lang="scss">
 .container {
+  padding-bottom: 100px;
   position: relative;
   width: 100%;
 }
@@ -135,7 +140,7 @@ export default class IndexPage extends Vue {
   width: 40px;
   height: 40px;
   position: absolute;
-  bottom: -50px;
+  bottom: 50px;
   right: 0;
   button {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);

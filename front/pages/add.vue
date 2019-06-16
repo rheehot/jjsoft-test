@@ -24,24 +24,81 @@
         />
       </div>
     </el-card>
+    <el-button type="primary" plain class="add-button" @click="addItem">
+      Add
+    </el-button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
+export interface TodoLists {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
+export interface TodoItem {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
 @Component
 export default class AddPage extends Vue {
   // data
   private inputTitle: string = ''
   private inputContent: string = ''
+  private todoItems: TodoLists[] = []
+
+  // beforeMount
+  beforeMount() {
+    this.todoItems = JSON.parse(localStorage.getItem('todos')!)
+  }
+
+  // methods
+  private addItem(): void {
+    const currentTime = Math.floor(new Date().getTime() / 1000)
+    const currentId = this.todoItems[this.todoItems.length - 1].id + 1
+    const item: TodoItem = {
+      id: currentId,
+      checked: false,
+      title: this.inputTitle,
+      content: this.inputContent,
+      createAt: currentTime.toString()
+    }
+    this.todoItems.push(item)
+    localStorage.setItem('todos', JSON.stringify(this.todoItems))
+    this.$message({
+      message: '추가되었습니다.',
+      type: 'success'
+    })
+    this.inputTitle = ''
+    this.inputContent = ''
+  }
 }
 </script>
 
 <style lang="scss">
+.main-title {
+  margin-top: 32px;
+  color: #fff;
+  a {
+    color: #fff;
+  }
+}
 .add-container {
   p {
     text-align: left;
   }
+}
+.add-button {
+  margin-top: 16px;
+  float: right;
 }
 </style>

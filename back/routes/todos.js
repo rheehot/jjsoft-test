@@ -5,6 +5,13 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
     res.status(200).json([
         {
+            id: 0,
+            checked: false,
+            title: '녹차 사기',
+            content: '개인적으로 좋아하는 녹차사기',
+            createAt: '1560577682'
+        },
+        {
             id: 1,
             checked: false,
             title: '바퀴벌레약 설치해놓기',
@@ -135,13 +142,6 @@ router.get('/', async (req, res, next) => {
             checked: false,
             title: '치과 스케일링 하러가기',
             content: '정기적인 스케일링이 필요하다',
-            createAt: '1560577682'
-        },
-        {
-            id: 20,
-            checked: false,
-            title: '여행 계획짜기',
-            content: '항상 여행은 계획 짤 때가 제일 좋은거 같다',
             createAt: '1560577682'
         }
     ])
