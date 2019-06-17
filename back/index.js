@@ -1,12 +1,13 @@
-const express = require('express');
-const morgan = require('morgan');
-const cros = require('cors');
-const cookieParser = require('cookie-parser');
-const expressSession = require('express-session');
-const dotenv = require('dotenv');
-const passport = require('passport');
-
-const todosAPIRouter = require('./routes/todos');
+import express from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import morgan from 'morgan'
+import cros from 'cors'
+import cookieParser from 'cookie-parser'
+import expressSession from 'express-session'
+import dotenv from 'dotenv'
+import passport from 'passport'
+import typeDefs from './graphql/schema'
+import resolvers from './graphql/resolvers'
 
 dotenv.config();
 const app = express();
@@ -28,8 +29,9 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/api/todos', todosAPIRouter);
+const apollo = new ApolloServer({ typeDefs, resolvers })
+apollo.applyMiddleware({ app })
 
 app.listen(8080, () => {
-    console.log('server is running on http://localhost:8080');
+    console.log(`server is running on http://localhost:8080${apollo.graphqlPath}`);
 });
