@@ -31,7 +31,8 @@ const config: NuxtConfiguration = {
           }
         ]
       ]
-    }
+    },
+    plugins: ['transform-decorators-legacy', 'transform-class-properties']
   },
   /*
    ** Customize the progress-bar color
@@ -48,7 +49,15 @@ const config: NuxtConfiguration = {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/eslint-module'],
+  modules: ['@nuxtjs/eslint-module', '@nuxtjs/apollo'],
+  apollo: {
+    clientConfigs: {
+      default: {
+        httpEndpoint: 'http://localhost:8080/graphql'
+      }
+    },
+    includeNodeModules: true
+  },
   /*
    ** Build configuration
    */

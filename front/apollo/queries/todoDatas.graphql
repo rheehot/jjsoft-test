@@ -1,0 +1,9 @@
+query todoDatas {
+  todoDatas {
+    id
+    checked
+    title
+    content
+    createAt
+  }
+}

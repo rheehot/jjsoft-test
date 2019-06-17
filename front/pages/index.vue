@@ -29,7 +29,8 @@
 
 <script lang="ts">
 import axios from '@/plugins/axios'
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Vue, Component } from 'nuxt-property-decorator'
+import todoDatas from '@/apollo/queries/todoDatas.graphql'
 
 export interface TodoLists {
   id: number
@@ -39,10 +40,24 @@ export interface TodoLists {
   createAt: string
 }
 
-@Component
+export interface TodoItem {
+  id: number
+  checked: boolean
+  title: string
+  content: string
+  createAt: string
+}
+
+@Component({
+  apollo: {
+    todoDatas: () => todoDatas
+  }
+})
 export default class IndexPage extends Vue {
   // data
+  private todoDatas: TodoItem[] = []
   private todoItems: TodoLists[] = []
+
   // beforeMount
   beforeMount() {
     !localStorage.getItem('todos')
@@ -50,14 +65,9 @@ export default class IndexPage extends Vue {
       : (this.todoItems = JSON.parse(localStorage.getItem('todos')!))
   }
   // methods
-  async initLoadDatas() {
-    try {
-      const { data: todos } = await axios.get('todos/')
-      this.todoItems = (await todos) as TodoLists[]
-      await localStorage.setItem('todos', JSON.stringify(todos))
-    } catch (err) {
-      console.error(err)
-    }
+  private initLoadDatas(): void {
+    this.todoItems = this.todoDatas as TodoLists[]
+    localStorage.setItem('todos', JSON.stringify(this.todoDatas))
   }
   private changeCheck(id): void {
     const findItem = this.todoItems[id]
