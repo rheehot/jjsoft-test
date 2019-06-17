@@ -9,7 +9,7 @@ const typeDefs = gql`
     createAt: String
   }
   type Query {
-    todos: [Todo]
+    todoDatas: [Todo]
   }
 `;
 

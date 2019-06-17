@@ -31,7 +31,8 @@ const config: NuxtConfiguration = {
           }
         ]
       ]
-    }
+    },
+    plugins: ['transform-decorators-legacy', 'transform-class-properties']
   },
   /*
    ** Customize the progress-bar color

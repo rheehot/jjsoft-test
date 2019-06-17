@@ -1,5 +1,5 @@
-{
-  todos {
+query todoDatas {
+  todoDatas {
     id
     checked
     title
