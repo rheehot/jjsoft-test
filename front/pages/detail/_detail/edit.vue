@@ -24,21 +24,22 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
+import gql from 'graphql-tag'
 
 export interface TodoLists {
   id: number
-  checked: boolean
+  completed: boolean
   title: string
   content: string
-  createAt: string
+  createAt: number
 }
 
 export interface TodoItem {
   id: number
-  checked: boolean
+  completed: boolean
   title: string
   content: string
-  createAt: string
+  createAt: number
 }
 
 @Component
@@ -66,6 +67,22 @@ export default class AddPage extends Vue {
   private saveItem(): void {
     this.todoItems[this.todoId].title = this.inputTitle
     this.todoItems[this.todoId].content = this.inputContent
+    this.$apollo.provider.defaultClient.writeQuery({
+      query: gql`
+        query todoDatas {
+          todoDatas {
+            id
+            completed
+            title
+            content
+            createAt
+          }
+        }
+      `,
+      data: {
+        todoDatas: this.todoItems
+      }
+    })
     localStorage.setItem('todos', JSON.stringify(this.todoItems))
     this.$message({
       message: '수정되었습니다.',

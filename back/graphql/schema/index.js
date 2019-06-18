@@ -3,10 +3,10 @@ import { gql } from 'apollo-server-express'
 const typeDefs = gql`
   type Todo {
     id: Int
-    checked: Boolean
+    completed: Boolean
     title: String
     content: String
-    createAt: String
+    createAt: Int
   }
   type Query {
     todoDatas: [Todo]
