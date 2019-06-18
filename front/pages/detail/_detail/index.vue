@@ -15,7 +15,7 @@
       </div>
     </el-card>
     <nuxt-link
-      v-if="!todoChecked"
+      v-if="!todoCompleted"
       :to="`/detail/${todoId}/edit`"
       class="edit-link-button"
     >
@@ -30,18 +30,18 @@ import { Route } from 'vue-router'
 
 export interface TodoLists {
   id: number
-  checked: boolean
+  completed: boolean
   title: string
   content: string
-  createAt: string
+  createAt: number
 }
 
 export interface TodoItem {
   id: number
-  checked: boolean
+  completed: boolean
   title: string
   content: string
-  createAt: string
+  createAt: number
 }
 
 @Component
@@ -50,7 +50,7 @@ export default class DetailPage extends Vue {
   private todoId: number = 0
   private todoTitle: string = ''
   private todoContent: string = ''
-  private todoChecked: boolean = false
+  private todoCompleted: boolean = false
   // beforeMount
   beforeMount() {
     this.todoId = Number(this.$route.params.detail)
@@ -61,7 +61,7 @@ export default class DetailPage extends Vue {
     if (todoItem) {
       this.todoTitle = todoItem.title
       this.todoContent = todoItem.content
-      this.todoChecked = todoItem.checked
+      this.todoCompleted = todoItem.completed
     }
   }
 }

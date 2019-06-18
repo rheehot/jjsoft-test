@@ -6,10 +6,10 @@
         v-for="todoItem in todoItems"
         :key="todoItem.id"
         class="text item"
-        :class="{ checked: todoItem.checked }"
+        :class="{ completed: todoItem.completed }"
       >
         <el-checkbox
-          v-model="todoItem.checked"
+          v-model="todoItem.completed"
           @change="changeCheck(todoItem.id)"
         />
         <nuxt-link class="todo-title" :to="`detail/${todoItem.id}`">
@@ -30,53 +30,106 @@
 <script lang="ts">
 import axios from '@/plugins/axios'
 import { Vue, Component } from 'nuxt-property-decorator'
+import gql from 'graphql-tag'
 import todoDatas from '@/apollo/queries/todoDatas.graphql'
 
 export interface TodoLists {
   id: number
-  checked: boolean
+  completed: boolean
   title: string
   content: string
-  createAt: string
+  createAt: number
 }
 
-export interface TodoItem {
-  id: number
-  checked: boolean
-  title: string
-  content: string
-  createAt: string
-}
-
-@Component({
-  apollo: {
-    todoDatas: () => todoDatas
-  }
-})
+@Component
 export default class IndexPage extends Vue {
   // data
-  private todoDatas: TodoItem[] = []
   private todoItems: TodoLists[] = []
 
   // beforeMount
   beforeMount() {
-    !localStorage.getItem('todos')
-      ? this.initLoadDatas()
-      : (this.todoItems = JSON.parse(localStorage.getItem('todos')!))
+    if (!localStorage.getItem('todos')) {
+      this.initLoadDatas()
+    } else {
+      this.todoItems = JSON.parse(localStorage.getItem('todos')!)
+      this.$apollo.provider.defaultClient.writeQuery({
+        query: gql`
+          query todoDatas {
+            todoDatas {
+              id
+              completed
+              title
+              content
+              createAt
+            }
+          }
+        `,
+        data: {
+          todoDatas: this.todoItems
+        }
+      })
+    }
   }
+
   // methods
   private initLoadDatas(): void {
-    this.todoItems = this.todoDatas as TodoLists[]
-    localStorage.setItem('todos', JSON.stringify(this.todoDatas))
+    this.$apollo
+      .query({
+        query: gql`
+          query todoDatas {
+            todoDatas {
+              id
+              completed
+              title
+              content
+              createAt
+            }
+          }
+        `
+      })
+      .then(({ data }) => {
+        this.todoItems = data.todoDatas as TodoLists[]
+        localStorage.setItem('todos', JSON.stringify(data.todoDatas))
+      })
   }
   private changeCheck(id): void {
-    const findItem = this.todoItems[id]
-    this.todoItems[id] = findItem
+    this.$apollo.provider.defaultClient.writeQuery({
+      query: gql`
+        query todoDatas {
+          todoDatas {
+            id
+            completed
+            title
+            content
+            createAt
+          }
+        }
+      `,
+      data: {
+        todoDatas: this.todoItems
+      }
+    })
     localStorage.setItem('todos', JSON.stringify(this.todoItems))
   }
   private deleteCheck(id): void {
     const filterItems = this.todoItems.filter(item => item.id !== id)
     this.todoItems = filterItems
+    this.$apollo.provider.defaultClient.writeQuery({
+      query: gql`
+        query todoDatas {
+          todoDatas {
+            id
+            completed
+            title
+            content
+            createAt
+          }
+        }
+      `,
+      data: {
+        todoDatas: this.todoItems
+      }
+    })
     localStorage.setItem('todos', JSON.stringify(this.todoItems))
   }
 }
@@ -118,7 +171,7 @@ export default class IndexPage extends Vue {
     &:first-child {
       margin-top: 0;
     }
-    &.checked {
+    &.completed {
       border-color: #409eff;
       .todo-title {
         text-decoration: line-through;
