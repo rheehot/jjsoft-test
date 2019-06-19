@@ -48,6 +48,7 @@ export interface TodoItem {
   title: string
   content: string
   createAt: number
+  __typename: string
 }
 
 @Component
