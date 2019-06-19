@@ -1,6 +1,14 @@
 <template>
   <div class="container">
     <h1 class="main-title">My TodoList</h1>
+    <div class="search-box">
+      <el-input
+        v-model="searchValue"
+        placeholder="Search Todos"
+        class="search-input"
+        @change="SearchTodos"
+      />
+    </div>
     <el-card class="todo-list-box">
       <div
         v-for="todoItem in todoItems"
@@ -29,7 +37,7 @@
 
 <script lang="ts">
 import axios from '@/plugins/axios'
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
 import gql from 'graphql-tag'
 import todoDatas from '@/apollo/queries/todoDatas.graphql'
 
@@ -45,6 +53,20 @@ export interface TodoLists {
 export default class IndexPage extends Vue {
   // data
   private todoItems: TodoLists[] = []
+  private searchValue: String = ''
+
+  @Watch('searchValue')
+  SearchTodos(val: string, oldVal: string) {
+    if (this.searchValue === '') {
+      this.todoItems = JSON.parse(localStorage.getItem('todos')!)
+    } else {
+      this.todoItems = this.todoItems.filter(items => {
+        return items.title
+          .toLowerCase()
+          .includes(this.searchValue.toLowerCase())
+      })
+    }
+  }
 
   // beforeMount
   beforeMount() {
@@ -140,6 +162,9 @@ export default class IndexPage extends Vue {
   position: relative;
   width: 100%;
 }
+.search-box {
+  margin-bottom: 32px;
+}
 .main-title {
   margin-top: 32px;
   color: #fff;
@@ -156,6 +181,7 @@ export default class IndexPage extends Vue {
   color: #606266;
 }
 .todo-list-box {
+  box-sizing: border-box;
   width: 100%;
   .el-card__body .item {
     text-align: left;
