@@ -1,5 +1,7 @@
 # jjsoft-test
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/seongjoojin/jjsoft-test.svg)](https://greenkeeper.io/)
+
 jjsoft front end test
 
 ## 실행방법
